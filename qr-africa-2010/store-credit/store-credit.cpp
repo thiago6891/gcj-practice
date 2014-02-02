@@ -8,15 +8,11 @@
 using namespace std;
 
 class Solution {
-	int _size;
 	int* _items;
 
 public:
-	void setSize(int s) { _size = s; }
 	void setItems(int* i) { _items = i; }
-	int itemCount() { return _size; }
 	int* getItems() { return _items; }
-
 };
 
 class TestCase {
@@ -24,9 +20,9 @@ class TestCase {
 	int _itemQty;
 	int* _prices;
 
-	bool rightCombo(int* combo, int size) {
+	bool rightCombo(int* combo) {
 		int sum = 0;
-		for (int i = 0; i < size; i++) {
+		for (int i = 0; i < 2; i++) {
 			sum += _prices[combo[i]];
 		}
 		return sum == this->_credit;
@@ -42,8 +38,8 @@ public:
 TestCase* createTestCasesFromFile(char*, int*);
 Solution* findSolutions(int, TestCase*);
 void outpoutSolutionsToFile(char*, int, Solution*);
-int* getFirstCombo(int);
-bool nextCombo(int*, int);
+int* getFirstCombo();
+void nextCombo(int*, int);
 
 int main(int argc, char** argv) {
 	if (argc != 3) return 1;
@@ -102,7 +98,7 @@ void outpoutSolutionsToFile(char* fname, int tc_count, Solution* solutions) {
 
 	for (int tc_num = 0; tc_num < tc_count; tc_num++) {
 		outfile << "Case #" << tc_num + 1 << ": ";
-		for (int s_item = 0; s_item < solutions[tc_num].itemCount(); s_item++) {
+		for (int s_item = 0; s_item < 2; s_item++) {
 			outfile << solutions[tc_num].getItems()[s_item] + 1 << " ";
 		}
 		outfile << endl;
@@ -111,44 +107,33 @@ void outpoutSolutionsToFile(char* fname, int tc_count, Solution* solutions) {
 	outfile.close();
 }
 
-int* getFirstCombo(int size) {
-	int* combo = new int[size];
-	for (int i = 0; i < size; i++) combo[i] = i;
+int* getFirstCombo() {
+	int* combo = new int[2];
+	for (int i = 0; i < 2; i++) combo[i] = i;
 	return combo;
 }
 
-bool nextCombo(int* combo, int size, int max) {
-	int elem = size - 1;
-	while (elem < size) {
+void nextCombo(int* combo, int max) {
+	int elem = 1;
+	while (elem < 2) {
 		if (combo[elem] < max) {
 			combo[elem]++;
 			elem++;
-			if (elem < size) combo[elem] = combo[elem - 1];
+			if (elem < 2) combo[elem] = combo[elem - 1];
 		} else {
 			elem--;
-			if (elem < 0) return false;
 		}
 	}
-
-	return true;
 }
 
 Solution TestCase::findSolution() {
 	Solution solution;
-
-	for (int i = 1; i <= this->_itemQty; i++) {
-		int* combo = getFirstCombo(i);
-		bool solved = this->rightCombo(combo, i);
-		while (!solved && nextCombo(combo, i, this->_itemQty - 1)) {
-			solved = this->rightCombo(combo, i);
-		}
-
-		if (solved) {
-			solution.setSize(i);
-			solution.setItems(combo);
-			break;
-		}
+	
+	int* combo = getFirstCombo();
+	while (!this->rightCombo(combo)) {
+		nextCombo(combo, this->_itemQty - 1);
 	}
-
+	solution.setItems(combo);
+	
 	return solution;
 }
