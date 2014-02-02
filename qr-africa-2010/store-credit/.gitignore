@@ -1,5 +1,10 @@
+Debug/
 *.sdf
 *.sln
 *.suo
 *.vcxproj
 *.filters
+*.in
+*.out
+*.opensdf
+*.user
